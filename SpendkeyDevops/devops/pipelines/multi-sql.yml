@@ -1,0 +1,41 @@
+
+parameters:
+  - name: Environment
+    type: string
+    values:
+      - "Dev"
+
+  - name: FolderName
+    displayName: FolderName
+    type: string
+
+trigger: none
+pr: none
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  - name: DECODE_PERCENTS
+
+stages:
+  - stage: ndev
+    displayName: NDev
+    dependsOn: []
+    variables:
+      - group: Common - Dev
+    condition: eq('${{parameters.Environment}}', 'Dev')
+    jobs:
+      - job:
+      - template: /SpendkeyDevops/devops/jobs/multi-jobs.yml@self    
+        parameters:
+          # mvp\SpendkeyDevops\devops\jobs\multi-jobs.yml
+          serviceConnection: Spendkey Development-db
+          azureSubscription: $(azureSubscription1)
+          subscription: $(subscription)
+          subscriptionId: $(subscriptionId)
+          FolderName: ${{ parameters.FolderName }}
+        
+      
+         
+

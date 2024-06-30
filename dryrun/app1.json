@@ -1,0 +1,125 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "app-ne-spendkey-angular": {
+            "defaultValue": "app-ne-spendkey-angular",
+            "type": "string"
+        },
+        "app-ne-spendkey-angular-plan": {
+            "defaultValue": "/subscriptions/187571e3-c50d-49ea-983f-41a86de0c2ec/resourceGroups/myRG/providers/Microsoft.Web/serverfarms/app-ne-spendkey-angular-plan",
+            "type": "string"            
+        },
+        "dockerImageName": {
+            "type": "string",
+            "defaultValue": "nginx:latest"
+        },
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located including a trailing '/'"
+            },
+            "defaultValue": "C:/Users/RanjeetDhole/Desktop/ResourceManager/mvp/templates/acr.json"
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
+            },
+            "defaultValue": "b3zzr5ml2uiwjwrhras76vo4acbsh2dbw2dc7yud4wagupxdtflq"
+        }
+
+    },
+    "functions": [],
+    "variables": {
+        "servicePlanName": "[concat(parameters('app-ne-spendkey-angular'), '-sp')]",
+        "acrName": "[concat(parameters('app-ne-spendkey-angular'),'acr')]"
+    },
+
+    "resources": [
+        {
+            "apiVersion": "2017-05-10",
+            "name": "linkedAcrTemplate",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(parameters('_artifactsLocation'),'acr.json', parameters('_artifactsLocationSasToken'))]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "acrName": {
+                        "value": "[variables('acrName')]"
+                    },
+                    "acrAdminUserEnabled": {
+                        "value": true
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "name": "[last(split(parameters('app-ne-spendkey-angular-plan'), '/'))]",
+            "apiVersion": "2023-01-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "B1",
+                "capacity": 1,
+                "tier": "Basic"
+            },
+            "kind": "linux",
+            "properties": {
+                "name": "[parameters('app-ne-spendkey-angular-plan')]"
+            }
+        },
+        {
+            "name": "[parameters('app-ne-spendkey-angular')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-09-01",
+            "location": "[resourceGroup().location]",
+            "kind": "app,linux,container",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('app-ne-spendkey-angular'),'.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(parameters('app-ne-spendkey-angular'), '.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('app-ne-spendkey-angular-plan'))]",
+                "reserved": true,
+                "siteConfig": {
+                    "name": "[parameters('app-ne-spendkey-angular')]",
+                    "appSettings": [
+                        {
+                            "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+                            "value": "false"
+                        },
+                        {
+                            "name": "DOCKER_REGISTRY_SERVER_URL",
+                            "value": "[reference('linkedAcrTemplate').outputs.acrLoginServer.value]"
+                        },
+                        {
+                            "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+                            "value": "[reference('linkedAcrTemplate').outputs.registryUsername.value]"
+                        },
+                        {
+                            "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+                            "value": "[reference('linkedAcrTemplate').outputs.registryPassword.value]"
+                        }
+                    ],
+                    "linuxFxVersion": "[concat('DOCKER|', reference('linkedAcrTemplate').outputs.acrLoginServer.value, '/', parameters('dockerImageName'))]"
+                }
+            }
+        }
+    ]
+}

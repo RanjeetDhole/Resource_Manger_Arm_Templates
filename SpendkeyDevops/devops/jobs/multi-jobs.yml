@@ -1,0 +1,42 @@
+parameters:
+  - name: repo
+    type: string
+    default: self
+
+  - name: subscriptionId
+    type: string
+    default: $(subscriptionId)
+
+  - name: subscription
+    type: string
+    default: $(subscription)
+
+  - name: serviceConnection
+    type: string
+
+  - name: azureSubscription
+    type: string
+    default: $(azureSubscription1)
+
+  - name: FolderName
+    type: string
+
+jobs:
+  - job: FolderName
+    displayName: Deploy Sql files into databases
+    steps:
+      - template: /SpendkeyDevops/devops/steps/multi-steps.yml@${{ parameters.repo }} 
+      # mvp\SpendkeyDevops\devops\steps\multi-steps.yml
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          subscription: $(subscription)
+          azureSubscription: $(azureSubscription1)
+          subscriptionId: $(subscriptionId)
+          FolderName: ${{ parameters.FolderName }}
+  
+
+
+
+
+    
+

@@ -1,0 +1,138 @@
+parameters:
+  - name: repo
+    type: string
+    default: self
+
+  - name: subscriptionId
+    type: string
+    default: $(subscriptionId)
+
+  - name: subscription
+    type: string
+    default: $(subscription)
+
+  - name: serviceConnection
+    type: string
+
+  - name: azureSubscription
+    type: string
+    default: $(azureSubscription1)
+
+  - name: location
+    type: string
+    default: $(location)
+
+  - name: urlname
+    type: string
+
+  - name: resourceGroupName
+    type: string
+ 
+  - name: login_command
+    type: string
+
+  - name: godaddy_domain
+    type: string
+
+  - name: godaddy_name
+    type: string
+
+  - name: godaddy_destination
+    type: string
+ 
+  - name: godaddy_key
+    type: string   
+
+  - name: godaddy_secret
+    type: string    
+
+jobs:
+  - job: CreateSpendkeyUrl
+    displayName: Create Spendkey URL for ${{parameters.urlname}}
+    steps:
+      - template: /SpendkeyDevops/devops/steps/arm-steps.yml@${{ parameters.repo }} 
+        parameters:
+          serviceConnection: ${{ parameters.serviceConnection }}
+          subscription: $(subscription)
+          azureSubscription: $(azureSubscription1)
+          subscriptionId: $(subscriptionId)
+          location: $(location)
+          urlname: ${{ parameters.urlname }}
+          resourceGroupName: ${{ parameters.resourceGroupName }}
+          login_command:  ${{ parameters.login_command }}
+          godaddy_domain: ${{ parameters.godaddy_domain }}
+          godaddy_name: ${{ parameters.godaddy_name }}
+          godaddy_destination: ${{ parameters.godaddy_destination }}
+          godaddy_key: ${{ parameters.godaddy_key }}
+          godaddy_secret: ${{ parameters.godaddy_secret }}
+
+
+
+    
+
+# # working ////
+# parameters:
+#   - name: repo
+#     type: string
+#     default: self
+
+#   - name: subscriptionId
+#     type: string
+
+#   - name: subscription
+#     type: string
+
+#   - name: serviceConnection
+#     type: string
+
+#   - name: location
+#     type: string
+
+#   - name: urlname
+#     type: string
+
+#   - name: resourceGroupName
+#     type: string
+ 
+#   - name: login_command
+#     type: string
+
+#   - name: godaddy_domain
+#     type: string
+
+#   - name: godaddy_name
+#     type: string
+
+#   - name: godaddy_destination
+#     type: string
+ 
+#   - name: godaddy_key
+#     type: string   
+
+#   - name: godaddy_secret
+#     type: string    
+
+# jobs:
+#   - job: CreateSpendkeyUrl
+#     displayName: Create Spendkey URL for ${{parameters.urlname}}
+#     steps:
+#       - template: /SpendkeyDevops/devops/steps/arm-steps.yml@${{ parameters.repo }} 
+#         parameters:
+#           subscriptionId: ${{ parameters.subscriptionId }}
+#           subscription: ${{ parameters.subscription }}
+#           serviceConnection: ${{ parameters.serviceConnection }}
+#           location: ${{ parameters.location }}
+#           urlname: ${{ parameters.urlname }}
+#           resourceGroupName: ${{ parameters.resourceGroupName }}
+#           login_command:  ${{ parameters.login_command }}
+#           # acr_server:  ${{ parameters.acr_server }} 
+#           godaddy_domain: ${{ parameters.godaddy_domain }}
+#           godaddy_name: ${{ parameters.godaddy_name }}
+#           godaddy_destination: ${{ parameters.godaddy_destination }}
+#           godaddy_key: ${{ parameters.godaddy_key }}
+#           godaddy_secret: ${{ parameters.godaddy_secret }}
+
+
+
+    
+

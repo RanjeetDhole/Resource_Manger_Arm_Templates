@@ -1,0 +1,127 @@
+parameters:
+  - name: repo
+    type: string
+    default: self
+
+  - name: subscriptionId
+    type: string
+    default: $(subscriptionId)
+
+  - name: subscription
+    type: string
+    default: $(subscription)
+
+  - name: serviceConnection
+    type: string
+
+  - name: azureSubscription
+    type: string
+    default: $(azureSubscription1)
+
+  - name: FolderName
+    type: string
+
+steps:
+  - checkout: self
+    persistCredentials: true
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.x'
+      addToPath: true
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install pyodbc
+    displayName: 'Install Python packages'
+
+  - task: PythonScript@0
+    displayName: Multi SQL deployment
+    inputs:
+      scriptSource: 'filePath'
+      scriptPath: '$(Build.SourcesDirectory)/SpendkeyDevops/devops/scripts/pythonscripts/multi-sql6.py'
+      arguments: --FolderName ${{ parameters.FolderName }}
+
+
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(build.SourcesDirectory)/SpendkeyDevops/devops/scripts/pythonscripts/sql_scripts'
+      Contents: '**'
+      TargetFolder: '$(build.SourcesDirectory)/dryrun'
+
+
+  - bash: |
+      git config --global user.email "ranjeet@spendkey.co.uk"
+      git config --global user.name "Ranjeet Dhole"
+      ls -la    
+      cd ResourceManger/
+      ls -la    
+      git fetch origin ResourceManger   
+      git switch ResourceManger   
+      mkdir -p dryrun/sql_scripts1
+      cp ../mvp/SpendkeyDevops/devops/scripts/pythonscripts/sql_scripts/*.sql /dryrun/sql_scripts1/*.sql
+      git status    
+      git add .    
+      git commit -m "backups"    
+      git push origin ResourceManger
+
+
+
+
+
+
+
+# parameters:
+#   - name: repo
+#     type: string
+#     default: self
+
+#   - name: subscriptionId
+#     type: string
+#     default: $(subscriptionId)
+
+#   - name: subscription
+#     type: string
+#     default: $(subscription)
+
+#   - name: serviceConnection
+#     type: string
+
+#   - name: azureSubscription
+#     type: string
+#     default: $(azureSubscription1)
+
+#   - name: FolderName
+#     type: string
+
+
+# steps:
+#   - checkout: self
+#     persistCredentials: 'true' 
+
+#   - task: UsePythonVersion@0
+#     inputs:
+#       versionSpec: '3.x'
+#       addToPath: true
+
+#   - script: |
+#       python -m pip install --upgrade pip
+#       pip install pyodbc
+#     displayName: 'python packages'
+
+
+#   - task: PythonScript@0
+#     displayName: Multi sql deployment 
+#     inputs:
+#       scriptSource: 'filePath'
+#       scriptPath: "$(Build.SourcesDirectory)/SpendkeyDevops/devops/scripts/pythonscripts/multi-sql6.py"
+#       arguments: --FolderName ${{ parameters.FolderName }}
+# # mvp\SpendkeyDevops\devops\scripts\pythonscripts\multi-sql6.py
+
+
+#   - task: CopyFiles@2
+#     inputs:
+#       SourceFolder: '$(Build.SourcesDirectory)/SpendkeyDevops/devops/scripts/pythonscripts/{{ parameters.FolderName }}'  # Adjust the source folder path
+#       Contents: '**'  # Copies all files
+#       TargetFolder: '$(Build.SourcesDirectory)/SpendkeyDevops/devops/scripts/pythonscripts/$(Build.BuildNumber)'  # Adjust the destination folder path
+#       OverWrite: true  # Overwrite files in the target folder if they exist p

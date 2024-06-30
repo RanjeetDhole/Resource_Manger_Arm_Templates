@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspaceName" : {
+            "value" : "dbknedemo"
+        },
+        "sku": {
+            "value": "standard"
+        },
+        "managedResourceGroupId": {
+        "value": "/subscriptions/187571e3-c50d-49ea-983f-41a86de0c2ec/resourceGroups/databricks-managed-resources"
+        }
+    }
+}

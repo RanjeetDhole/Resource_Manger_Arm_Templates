@@ -1,0 +1,108 @@
+
+parameters:
+
+  - name: urlName
+    displayName: URL Name
+    type: string
+
+  - name: Environment
+    type: string
+    values:
+      - "Dev"
+
+  - name: resourceGroupName
+    displayName: resourceGroupName
+    type: string
+
+trigger: none
+pr: none
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  - name: DECODE_PERCENTS
+
+stages:
+  - stage: ndev
+    displayName: NDev
+    dependsOn: []
+    variables:
+      - group: Common - Dev
+    condition: eq('${{parameters.Environment}}', 'Dev')
+    jobs:
+      - job:
+      - template: /SpendkeyDevops/devops/jobs/arm-jobs.yml@self    
+        parameters:
+          # Mandatory parameters
+          serviceConnection: Spendkey Development-db
+          azureSubscription: $(azureSubscription1)
+          subscription: $(subscription)
+          subscriptionId: $(subscriptionId)
+          location: $(location)
+          urlname: ${{ parameters.urlName }}
+          resourceGroupName: ${{ parameters.resourceGroupName }}
+          login_command: "az account set --subscription $(subscriptionId)"
+          godaddy_domain: spendkey.app
+          godaddy_name: ${{ parameters.urlName }}
+          godaddy_destination: fd-sk-${{ parameters.urlName }}.azurefd.net
+          godaddy_key: e4CNfogUXNzM_XKLTmaZ1rZ3VoZCeYVsDZy
+          godaddy_secret: KBpz3tKf4NASXMdHswRA8n 
+      
+         
+
+
+
+
+# working ////
+
+# parameters:
+#   - name: urlName
+#     displayName: URL Name
+#     type: string
+
+#   - name: Environment
+#     type: string
+#     values:
+#       - "Dev"
+
+#   - name: resourceGroupName
+#     displayName: resourceGroupName
+#     type: string
+
+# trigger: none
+
+# pool:
+#   vmImage: "ubuntu-latest"
+
+# variables:
+#   - name: DECODE_PERCENTS
+
+# stages:
+#   - stage: ndev
+#     displayName: NDev
+#     dependsOn: []
+#     variables:
+#       - group: Common - Dev
+#     condition: eq('${{parameters.Environment}}', 'Dev')
+#     jobs:
+#       - job:
+#       - template: /SpendkeyDevops/devops/jobs/arm-jobs.yml@self    
+#         parameters:
+#           # Mandatory parameters
+#           serviceConnection: "Spendkey Development-db"
+#           subscription: "Spendkey Development"
+#           subscriptionId: 187571e3-c50d-49ea-983f-41a86de0c2ec
+#           location: northeurope
+#           urlname: ${{ parameters.urlName }}
+#           resourceGroupName: ${{ parameters.resourceGroupName }}
+#           login_command: "az account set --subscription 187571e3-c50d-49ea-983f-41a86de0c2ec"
+#           # acr_server: cregnespendkey123.azurecr.io
+#           godaddy_domain: spendkey.app
+#           godaddy_name: ${{ parameters.urlName }}
+#           godaddy_destination: fd-sk-${{ parameters.urlName }}.azurefd.net.
+#           godaddy_key: e4CNfogUXNzM_XKLTmaZ1rZ3VoZCeYVsDZy
+#           godaddy_secret: KBpz3tKf4NASXMdHswRA8n 
+      
+         
+

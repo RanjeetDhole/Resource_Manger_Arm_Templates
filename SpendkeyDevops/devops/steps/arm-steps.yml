@@ -1,0 +1,385 @@
+parameters:
+  - name: repo
+    type: string
+    default: self
+
+  - name: subscriptionId
+    type: string
+    default: $(subscriptionId)
+
+  - name: subscription
+    type: string
+    default: $(subscription)
+
+  - name: serviceConnection
+    type: string
+
+  - name: azureSubscription
+    type: string
+    default: $(azureSubscription1)
+
+  - name: location
+    type: string
+    default: $(location)
+
+  - name: urlname
+    type: string
+
+  - name: resourceGroupName
+    type: string
+
+  - name: login_command
+    type: string
+
+  - name: godaddy_domain
+    type: string
+
+  - name: godaddy_name
+    type: string
+
+  - name: godaddy_destination
+    type: string
+ 
+  - name: godaddy_key
+    type: string   
+
+  - name: godaddy_secret
+    type: string    
+
+steps:
+  - checkout: self
+    persistCredentials: 'true' 
+
+# # working storage
+#   - task: AzureResourceGroupDeployment@2
+#     displayName: Deploy storage ${{parameters.urlname}}
+#     inputs:
+#       azureSubscription: ${{ parameters.serviceConnection }}
+#       resourceGroupName: ${{ parameters.resourceGroupName }}
+#       location: $(location)
+#       csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/storage.json
+#       # mvp/SpendkeyDevops/devops/Arm_Templates/storage.json
+#       overrideParameters: >-
+#         -location $(location)
+#         -urlName "${{ parameters.urlname }}"
+#       deploymentOutputs: "ARM_OUTPUT"
+#       timeoutInMinutes: 60
+
+# working databricks
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy databricks ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: $(location)
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/databricks.json
+      # mvp\SpendkeyDevops\devops\Arm_Templates\databricks.json
+      overrideParameters: >-
+        -location $(location)
+        -urlName "${{ parameters.urlname }}"
+        -subscriptionId $(subscriptionId)
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+
+# # working keyvault
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy keyvault ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: $(location)
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/keyvault3.json
+      # mvp/SpendkeyDevops/devops/Arm_Templates/keyvault3.json
+      overrideParameters: >-
+        -location "$(location)"
+        -urlName "${{ parameters.urlname }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+
+# # working logic app
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy logicapp ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location:  $(location)
+      # mvp/SpendkeyDevops/devops/Arm_Templates/logicapp.json
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/logicapp.json
+      overrideParameters: >-
+        -location "$(location)"
+        -urlName "${{ parameters.urlname }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+# # working sql server
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy sql server ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location:  $(location)
+      # mvp/SpendkeyDevops/devops/Arm_Templates/sql-server.json
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/sql-server.json
+      overrideParameters: >-
+        -location "$(location)"
+        -urlName "${{ parameters.urlname }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+# # working sql database
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy sql database ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: $(location)
+      #mvp/SpendkeyDevops/devops/Arm_Templates/sql-db.json
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/sql-db.json
+      overrideParameters: >-
+        -location "$(location)"
+        -urlName "${{ parameters.urlname }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+
+# # working datafactory(v2)
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy datafactory ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: $(location)
+      # mvp/SpendkeyDevops/devops/Arm_Templates/datafactory.json
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/datafactory.json
+      overrideParameters: >-
+        -location " $(location)"
+        -urlName "${{ parameters.urlname }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+
+# # working function app 
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy  functionapp ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: $(location)
+      # mvp/SpendkeyDevops/devops/Arm_Templates/functionapp2.json
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/functionapp2.json
+      overrideParameters: >-
+        -location "$(location)"
+        -urlName "${{ parameters.urlname }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+
+# # working-------if
+# #   - script: |
+# #       python -m pip install --upgrade pip
+# #       pip install azure-identity azure-mgmt-web
+# #       pip install azure-mgmt-web==2.0.0
+# #       pip install azure-identity==1.6.0
+# #       pip install azure
+#   #   displayName: 'python packages'
+
+#   # - script: |
+#   #     python -m venv myenv
+#   #     myenv\Scripts\activate
+#   #   displayName: 'Set up virtual environment'
+
+#   # - bash: |
+#   #     pip install azure
+#   #   displayName: 'Install requirements'
+
+#   # - script: |
+#   #     python -m pip install -r $(Build.SourcesDirectory)/templates/pythonscripts/requirements.txt
+#   #     python -m pip install azure-identity azure-mgmt-web
+#   #   displayName: 'Install requirements'
+#       #   pip install azure-identity
+#       # pip install azure-mgmt-web
+
+
+# working azure container registy 
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy ContainerRegistry ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: $(location)
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/acr.json
+      # mvp/SpendkeyDevops/devops/Arm_Templates/acr.json
+      overrideParameters: >-
+        -location "$(location)"
+        -urlName "${{ parameters.urlname }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+##working
+  - script: |
+      az login --service-principal -u $(client-id) -p $(secret-id) --tenant $(tenantId)
+      az account set --subscription $(subscriptionId)
+    displayName: 'Azure CLI login'
+
+# ##working
+#   - script: |
+#       az login --service-principal -u 0a274cf8-dbb8-4226-83df-5f02c2b47cde -p 9VE8Q~ZmrNsQ.tTxcx2.BvfTowwIxKlMtmiZMbD0 --tenant 862921fd-f4cb-4a0f-86e9-c450994eb3f9
+#       az account set --subscription 187571e3-c50d-49ea-983f-41a86de0c2ec
+#     displayName: 'Azure CLI login'
+
+  - task: UsePythonVersion@0
+    displayName: Use Python 3.7
+    inputs: 
+      versionSpec: 3.7
+
+# working for container registry push docker image 
+  - task: PythonScript@0
+    displayName: Add nginx default image 
+    inputs:
+      scriptSource: 'filePath'
+      scriptPath: "$(Build.SourcesDirectory)/SpendkeyDevops/devops/scripts/pythonscripts/nginx_img_push_acr.py"
+      arguments: --urlname ${{ parameters.urlname }} --login_command ${{ parameters.login_command }}
+
+
+# working azure app plan for both 
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy AppService Plan ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: $(location)
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/app_plan.json
+      # mvp/SpendkeyDevops/devops/Arm_Templates/app_plan.json
+      overrideParameters: >-
+        -location "$(location)"
+        -urlName "${{ parameters.urlname }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+# working azure  angular app service 
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy AppService ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: $(location)
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/appser_angular.json
+      overrideParameters: >-
+        -location "$(location)"
+        -urlName "${{ parameters.urlname }}"
+        -subscriptionId "$(subscriptionId)"
+        -resourceGroupName "${{ parameters.resourceGroupName }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+
+# working  for app service enviroment  file for angular 
+  - task: PythonScript@0
+    displayName: Add nginx default image for angular app service 
+    inputs:
+      scriptSource: 'filePath'
+      scriptPath: "$(Build.SourcesDirectory)/SpendkeyDevops/devops/scripts/pythonscripts/app_serv_angular_env_pass.py"
+      arguments: >
+        --urlname ${{ parameters.urlname }}
+        --login_command ${{ parameters.login_command }}
+        --resourceGroupName ${{ parameters.resourceGroupName }}
+        --subscriptionId $(subscriptionId)
+
+      # --urlname ${{ parameters.urlname }}
+      # --login_command "az account set --name 'Spendkey Development'"
+      # --resourceGroupName ${{ parameters.resourceGroupName }}
+      # --subscription ${{ parameters.subscription }}
+
+
+# # working azure  microservice  app service 
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy AppService ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: $(location)
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/appser_microser.json
+      # mvp\SpendkeyDevops\devops\Arm_Templates\appser_microser.json
+      overrideParameters: >-
+        -location " $(location)"
+        -urlName "${{ parameters.urlname }}"
+        -subscriptionId "$(subscriptionId)"
+        -resourceGroupName "${{ parameters.resourceGroupName }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+# working  for app service enviroment  file for microservice
+
+  - task: PythonScript@0
+    displayName: Add nginx default image for microservice app service 
+    inputs:
+      scriptSource: 'filePath'
+      scriptPath: "$(Build.SourcesDirectory)/SpendkeyDevops/devops/scripts/pythonscripts/app_serv_micro_env_pass.py"
+      arguments:
+        --urlname ${{ parameters.urlname }}
+        --login_command ${{ parameters.login_command }}
+        --resourceGroupName ${{ parameters.resourceGroupName }}
+        --subscriptionId "$(subscriptionId)"
+
+
+# # working fornt door 
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy front door ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: "$(location)"
+      # mvp\SpendkeyDevops\devops\Arm_Templates\frontdoor.json
+      csmFile: $(Build.SourcesDirectory)/SpendkeyDevops/devops/Arm_Templates/frontdoor.json
+      overrideParameters: >-
+        -urlName "${{ parameters.urlname }}"
+      deploymentOutputs: "ARM_OUTPUT"
+      timeoutInMinutes: 60
+
+
+# working front door for url name entry
+  - task: PowerShell@2
+    displayName: Create entry in Godaddy
+    inputs:
+     targetType: "filePath"
+    #  mvp/SpendkeyDevops/devops/scripts/powershell/add_gd_dns_cname.ps1
+     filePath: "$(Build.SourcesDirectory)/SpendkeyDevops/devops/scripts/powershell/add_gd_dns_cname.ps1"
+     arguments: >
+      -godaddy_domain: '${{ parameters.godaddy_domain }}'
+      -godaddy_name: '${{ parameters.godaddy_name }}'
+      -godaddy_destination: '${{ parameters.godaddy_destination }}'
+      -godaddy_key: '${{ parameters.godaddy_key }}'
+      -godaddy_secret: '${{ parameters.godaddy_secret }}'
+
+# app-angular-imnt
+  - task: AzureAppServiceManage@0
+    displayName: Restart App Service Angular
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      Action: "Restart Azure App Service"
+      WebAppName: "app-angular-${{ parameters.urlName }}"
+
+# app-microservice-imnt
+  - task: AzureAppServiceManage@0
+    displayName: Restart App Service Microservice
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      Action: "Restart Azure App Service"
+      WebAppName: "app-microservice-${{ parameters.urlName }}"
+
+  - task: AzureCLI@2
+    displayName: Set frontdoor endpoint and routing rule
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: "pscore"
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        az extension add --name front-door
+        az config set extension.use_dynamic_install=yes_without_prompt
+        az network front-door frontend-endpoint create --front-door-name fd-sk-${{ parameters.urlName }} --host-name "${{ parameters.urlName }}.spendkey.app" --name "${{ parameters.urlName }}-spendkey-app" -g ${{ parameters.resourceGroupName }} --session-affinity-enabled 'Disabled'
+        az network front-door routing-rule update --front-door-name fd-sk-${{ parameters.urlName }} -g ${{ parameters.resourceGroupName }} --name rt-angular --add frontendEndpoints '{\"id\": \"/subscriptions/$(subscriptionId)/resourceGroups/${{ parameters.resourceGroupName }}/providers/Microsoft.Network/frontdoors/fd-sk-${{ parameters.urlName }}/frontendEndpoints/${{ parameters.urlName }}-spendkey-app\", \"resourceGroup\": \"${{ parameters.resourceGroupName }} \"}'
+        az network front-door frontend-endpoint enable-https --front-door-name fd-sk-${{ parameters.urlName }} --name "${{ parameters.urlName }}-spendkey-app" --resource-group ${{ parameters.resourceGroupName }}
+      addSpnToEnvironment: true
+      useGlobalConfig: true

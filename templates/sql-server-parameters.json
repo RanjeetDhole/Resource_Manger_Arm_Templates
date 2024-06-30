@@ -1,0 +1,96 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    
+    "parameters":{
+        "sql_server_name": {
+            "value": "sk-sql-server"
+        },
+        "sql_server_location": {
+            "value": "North Europe"
+        },
+        "administratorLogin": {
+            "value": "Spendkey"
+        },
+        "administratorLoginPassword": {
+            "value": "Spend@2022"
+        }
+    }
+  
+}
+
+
+
+
+// {
+//     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+//     "contentVersion": "1.0.0.0",
+//     "parameters": {
+//       "sql_server_name": {
+//         "type": "string"
+//       },
+//       "sql_server_loction": {
+//         "type": "string"
+//       },
+//       "SqlSerLogin":{
+//         "type":"string"
+//       },
+//       "SqlSerPasswd": {
+//         "type": "string"
+//       },
+//       "Login": {
+//         "type": "string"
+//       },
+//       "SqlDBName": {
+//         "type": "string"
+//       },
+//       "SqlDBEdition": {
+//         "type": "string"
+//       }
+
+//     },
+//     "functions": [],
+//     "variables": {},
+//     "resources": [
+//         {
+//   "type": "Microsoft.Sql/servers",
+//   "apiVersion": "2019-06-01-preview",
+//   "name": "[parameters('sql_server_name')]",
+//   "location": "[parameters('sql_server_loction')]",
+//   "identity": {
+//     "type": "SystemAssigned"
+//   },
+//   "properties": {
+//     "administratorLogin": "[parameters('SqlSerLogin')]",
+//     "administratorLoginPassword": "[parameters('SqlSerPasswd')]",
+//     "administrators": {
+//       "administratorType": "ActiveDirectory",
+//       "azureADOnlyAuthentication": "true",
+//       "login": "[parameters('Login')]",
+//       "sid": "string",
+//       "tenantId": "string"
+//     },
+//     "publicNetworkAccess": "Enabled"
+//   }
+// },
+// {
+//     "name": "[parameters('SqlDBName')]",
+//     "type": "Microsoft.Sql/servers/databases",
+//     "apiVersion": "2014-04-01",
+//     "location": "[resourceGroup().location]",
+//     "tags": {
+//         "displayName": "db-sk-server"
+//     },
+//     "dependsOn": [
+//         "[resourceId('Microsoft.Sql/servers', 'sk-sql-server')]"
+//     ],
+//     "properties": {
+//         "collation": "SQL_Latin1_General_CP1_CI_AS",
+//         "edition": "[parameters('SqlDBEdition')]",
+//         "maxSizeBytes": "1073741824",
+//         "requestedServiceObjectiveName": "Standard"
+//     }
+// }
+//     ],
+//     "outputs": {}
+// }

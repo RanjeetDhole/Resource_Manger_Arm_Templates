@@ -1,0 +1,233 @@
+parameters:
+  - name: repo
+    type: string
+    default: self
+
+  - name: subscriptionId
+    type: string
+
+  - name: subscription
+    type: string
+
+  - name: serviceConnection
+    type: string
+
+  - name: location
+    type: string
+
+  - name: urlname
+    type: string
+
+  - name: dbServerName
+    type: string
+
+  - name: resourceGroupName
+    type: string
+
+  - name: keyvault
+    type: string
+
+  - name: godaddy_domain
+    type: string
+
+  - name: godaddy_name
+    type: string
+
+  - name: godaddy_destination
+    type: string
+ 
+  - name: godaddy_key
+    type: string   
+
+  - name: godaddy_secret
+    type: string    
+
+  - name: ReportName
+    type: string 
+
+ 
+
+  - name: secrets
+    type: string
+    default: "*"
+
+steps:
+  - checkout: powerbi
+    persistCredentials: 'true'
+  - checkout: self
+    persistCredentials: 'true'
+  - task: Bash@3
+    displayName: display the variables
+    inputs:
+      targetType: "inline"
+      script: |
+        echo "subscriptionId: ${{ parameters.subscriptionId }}"
+        echo "subscription: ${{ parameters.subscription }}"
+        echo "serviceConnection: ${{ parameters.serviceConnection }}"
+        echo "location: ${{ parameters.location }}"
+        echo "urlname: ${{ parameters.urlname }}"
+
+  - task: AzureResourceGroupDeployment@2
+    displayName: Deploy db ${{parameters.urlname}}
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: ${{ parameters.location }}
+      csmFile: $(Build.SourcesDirectory)\mvp\SpendkeyDevops\devops\armTemplates\create-spendkey-sql-server-db.json
+      
+      overrideParameters: >-
+        -urlName "${{ parameters.urlName }}"
+        -location "${{ parameters.location }}"
+        -subscription "${{ parameters.subscription }}"
+        -subscriptionId "${{ parameters.subscriptionId }}"
+        -dbServerName "${{ parameters.dbServerName }}"
+      deploymentOutputs: "ARM_OUTPUT"
+
+  - task: AzureKeyVault@2
+    displayName: Get Secret from Key Vault
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      KeyVaultName: ${{ parameters.keyvault }}
+      SecretsFilter: ${{ parameters.secrets }}
+      RunAsPreJob: false
+
+  - task: AzureCLI@2
+    displayName: Set database connection string in key vault
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: "pscore"
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        az keyvault secret set --vault-name "${{ parameters.keyvault }}" --name "${{ parameters.urlName }}-db" --value "Server=$(sql-server-name);Database=sqldb-ne-${{ parameters.urlName }}-spendkey;UID=$(sql-server-user);Password=$(sql-server-pwd);Encrypt=True;TrustServerCertificate=False"
+        #az keyvault secret set --vault-name "${{ parameters.keyvault }}" --name "${{ parameters.urlName }}-pbiUser" --value "PbiWorkSpace=$(PbiWorkSpace);tenantId=$(tenantId);applictionId=$(applictionId);applicationSecret=$(applicationSecret);Encrypt=True;TrustServerCertificate=False"
+      addSpnToEnvironment: true
+      useGlobalConfig: true
+
+  - task: SqlAzureDacpacDeployment@1
+    displayName: Deploy database schema
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      ServerName: $(sql-server-name)
+      DatabaseName: sqldb-ne-${{ parameters.urlName}}-spendkey
+      SqlUsername: $(sql-server-user)
+      SqlPassword: $(sql-server-pwd)
+      deployType: SqlTask
+      SqlFile: $(Build.SourcesDirectory)\mvp\SpendkeyDevops\devops\scripts\sql\newsqlscript.sql
+
+
+  # - task: AzureAppServiceManage@0
+  #   displayName: Restart App Service
+  #   inputs:
+  #     azureSubscription: ${{ parameters.serviceConnection }}
+  #     Action: "Restart Azure App Service"
+  #     WebAppName: "app-ne-prod-spendkey-microservice1"
+
+  - task: PowerShell@2
+    displayName: Create entry in Godaddy
+    inputs:
+     targetType: "filePath"
+     filePath: "$(Build.SourcesDirectory)/mvp/SpendkeyDevops/devops/scripts/powershell/add_gd_dns_cname.ps1"
+     arguments: >
+      -godaddy_domain: '${{ parameters.godaddy_domain }}'
+      -godaddy_name: '${{ parameters.godaddy_name }}'
+      -godaddy_destination: '${{ parameters.godaddy_destination }}'
+      -godaddy_key: '${{ parameters.godaddy_key }}'
+      -godaddy_secret: '${{ parameters.godaddy_secret }}'
+  
+
+
+  # - task: AzureCLI@2
+  #   displayName: Set database connection string in key vault
+  #   inputs:
+  #     azureSubscription: ${{ parameters.serviceConnection }}
+  #     scriptType: "pscore"
+  #     scriptLocation: "inlineScript"
+  #     inlineScript: |
+  #       az keyvault secret set --vault-name "${{ parameters.keyvault }}" --name "${{ parameters.urlName }}-pbiUser" --value "PbiWorkSpace=$(PbiWorkSpace);tenantId=$(tenantId);applictionId=$(applictionId);applicationSecret=$(applicationSecret);Encrypt=True;TrustServerCertificate=False"
+  #     addSpnToEnvironment: true
+  #     useGlobalConfig: true
+
+
+
+  - task: PowerShell@2
+    displayName: Create powerbi report
+    inputs:
+      arguments: >
+        -dummyvariable: "this a dummy variable value" -reportName: '${{ parameters.urlName }}' -serverName: '$(sql-server-name)' -databaseName: 'sqldb-ne-${{ parameters.urlName}}-spendkey' -sqlUsername: '$(sql-server-user)' -sqlPassword: '$(sql-server-pwd)' -tenantId: '$(tenantId)' -applictionId: '$(applictionId)' -applicationSecret: '$(applicationSecret)'  -workspace: 'd8fcf17b-c071-4c44-b0f2-be90c6f6e2db' -OutputDir: '$(Build.SourcesDirectory)\mvp'
+        # -dummyvariable: "this a dummy variable value"
+        # -reportName: '${{ parameters.urlName }}'
+        # -serverName: '$(sql-server-name)'
+        # -databaseName: 'sqldb-ne-${{ parameters.urlName}}-spendkey'
+        # -sqlUsername: '$(sql-server-user)'
+        # -sqlPassword: '$(sql-server-pwd)'
+        # -tenantId: '$(tenantId)'
+        # -applictionId: '$(applictionId)'
+        # -applicationSecret: '$(applicationSecret)' 
+        # -workspace: 'd8fcf17b-c071-4c44-b0f2-be90c6f6e2db'
+        # -OutputDir: '$(Build.SourcesDirectory)\mvp'
+        # #-workspace: '93734312-1f28-4d1b-8345-59d22aa0d7fa'
+      targetType: 'filePath'
+      filePath: '$(Build.SourcesDirectory)/mvp/SpendkeyDevops/devops/scripts/powershell/add_pb_report.ps1'
+
+      
+             
+      #workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+  - bash: |
+      git config --global user.email "abhishek@cloudaeon.net"    
+      git config --global user.name "Abhishek Gaikwad"
+      ls -la    
+      cd powerbi/
+      ls -la    
+      git fetch --all    
+      git switch main   
+      mkdir -p pbix/${{ parameters.urlName }}
+      cp ../mvp/${{ parameters.urlName }}.pbix ./pbix/${{ parameters.urlName }}/${{ parameters.urlName }}.pbix    
+      git status    
+      git add .    
+      git commit -m "PowerBI"    
+      git push origin
+   
+  #  - job:
+  #       trigger: none
+  #       pr: none
+
+  #       resources:
+  #         repositories:
+  #         - repository: powerbi
+  #           type: git
+  #           name: powerbi
+   
+  #       steps:
+  #        - checkout: self
+  #          persistCredentials: 'true'
+  #        - checkout: powerbi
+  #          persistCredentials: 'true'
+
+  #        - bash: |
+  #             git config --global user.email "abhishek@cloudaeon.net"    
+  #             git config --global user.name "Abhishek Gaikwad"
+  #             ls -la    
+  #             cd ./powerbi/pbix    
+  #             git fetch --all    
+  #             git switch $(basename $(Build.SourceBranch))    
+  #             cp ..D:/a/1/s/$ReportName.pbix ./pbix/$ReportName.pbix    
+  #             git status    
+  #             git add $ReportName.pbix    
+  #             git commit -m "PowerBI"    
+  #             git push origin
+
+  - task: AzureCLI@2
+    displayName: Set frontdoor endpoint and routing rule
+    inputs:
+      azureSubscription: ${{ parameters.serviceConnection }}
+      scriptType: "pscore"
+      scriptLocation: "inlineScript"
+      inlineScript: |
+        az extension add --name front-door
+        az config set extension.use_dynamic_install=yes_without_prompt
+        az network front-door frontend-endpoint create --front-door-name fd-ne-prod-spendkey1 --host-name "${{ parameters.urlName }}.spendkey.app" --name "${{ parameters.urlName }}-spendkey-app" -g rg-ne-prod-spendkey --session-affinity-enabled 'Disabled'
+        az network front-door routing-rule update --front-door-name fd-ne-prod-spendkey1 -g rg-ne-prod-spendkey --name rt-angular1 --add frontendEndpoints '{\"id\": \"/subscriptions/cdef7c62-d8a5-45ce-9c4b-4fe7ef8a9082/resourceGroups/rg-ne-prod-spendkey/providers/Microsoft.Network/frontdoors/fd-ne-prod-spendkey1/frontendEndpoints/${{ parameters.urlName }}-spendkey-app\", \"resourceGroup\": \"rg-ne-prod-spendkey \"}'
+        az network front-door frontend-endpoint enable-https --front-door-name fd-ne-prod-spendkey1  --name "${{ parameters.urlName }}-spendkey-app" --resource-group rg-ne-prod-spendkey
+      addSpnToEnvironment: true
+      useGlobalConfig: true

@@ -1,0 +1,63 @@
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "urlName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        }        
+    },
+    "functions": [],
+    "variables": {
+        "sql-server-name": "[concat('sql-serv-',parameters('urlName'))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('sql-server-name')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2021-11-01",
+            "location": "[parameters('location')]",
+            "tags": {
+                "displayName": "RanjeetDhole"
+            },
+            "properties": {
+                "administratorLogin": "CloudSA697e03f6",  
+                "administratorLoginPassword": "wpxfTCd?K3R+73U~CPWo@TNMBt3@%"
+            },
+            "resources": [
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2014-04-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers',variables('sql-server-name'))]"
+                    ],
+                    "location": "[parameters('location')]",
+                    "name": "AllowAllWindowsAzureIps",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                },
+                {
+                    "type": "administrators",
+                    "apiVersion": "2021-11-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', variables('sql-server-name'))]"
+                    ],
+                    "name": "ActiveDirectory",
+                    "properties": {
+                        "administratorType": "ActiveDirectory",
+                        "login": "ranjeet@spendkey.co.uk",  
+                        "sid": "6c44c4d9-e290-4a2f-920b-a6d97ed7bec8",    
+                        "tenantId": "862921fd-f4cb-4a0f-86e9-c450994eb3f9"      
+                    }
+                }                
+            ]
+        }
+    ],
+    "outputs": {}
+}
+

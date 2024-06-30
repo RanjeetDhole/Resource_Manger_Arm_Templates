@@ -1,0 +1,83 @@
+parameters:
+  - name: repo
+    type: string
+    default: self
+
+  - name: subscriptionId
+    type: string
+
+  - name: subscription
+    type: string
+
+  - name: serviceConnection
+    type: string
+
+  - name: location
+    type: string
+
+  - name: urlname
+    type: string
+
+  - name: dbServerName
+    type: string
+
+  - name: resourceGroupName
+    type: string
+
+  - name: keyvault
+    type: string
+
+  - name: godaddy_domain
+    type: string
+
+  - name: godaddy_name
+    type: string
+
+  - name: godaddy_destination
+    type: string
+
+  - name: godaddy_key
+    type: string   
+
+  - name: godaddy_secret
+    type: string 
+
+  - name: ReportName
+    type: string 
+
+  - name: secrets
+    type: string
+    default: "*"
+
+jobs:
+  - job: CreateSpendkeyUrl
+    #dependsOn: ${{parameters.dependsOn}}
+    displayName: Create Spendkey URL for ${{parameters.urlname}}
+    steps:
+        
+      - template: /SpendkeyDevops/devops/steps/create_sk_link_steps.yml@${{ parameters.repo }} 
+      
+        parameters:
+          subscriptionId: ${{ parameters.subscriptionId }}
+          subscription: ${{ parameters.subscription }}
+          serviceConnection: ${{ parameters.serviceConnection }}
+          location: ${{ parameters.location }}
+          urlname: ${{ parameters.urlname }}
+          keyvault: ${{ parameters.keyvault }}
+          dbServerName: ${{ parameters.dbServerName }}
+          secrets: ${{ parameters.secrets }}
+          resourceGroupName: ${{ parameters.resourceGroupName }}
+          godaddy_domain: ${{ parameters.godaddy_domain }}
+          godaddy_name: ${{ parameters.godaddy_name }}
+          godaddy_destination: ${{ parameters.godaddy_destination }}
+          godaddy_key: ${{ parameters.godaddy_key }}
+          godaddy_secret: ${{ parameters.godaddy_secret }}
+          ReportName: ${{ parameters.ReportName }}
+          
+      
+
+
+
+
+    
+

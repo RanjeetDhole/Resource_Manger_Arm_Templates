@@ -1,0 +1,71 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "urlName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        }      
+    },
+    "functions": [],
+    "variables": {
+      "sql_server_name": "[concat('sql-serv-',parameters('urlName'))]",
+      "sql_database_name": "[concat('sqldb-sk-',parameters('urlName'))]"
+    },
+    "resources": [
+        {
+  "type": "Microsoft.Sql/servers",
+  "apiVersion": "2019-06-01-preview",
+  "name": "[variables('sql_server_name')]",
+  "location": "[parameters('location')]",
+  "identity": {
+    "type": "SystemAssigned"
+  },
+  "properties": {
+    "administratorLogin": "CloudSA697e03f6",
+    "administratorLoginPassword": "wpxfTCd?K3R+73U~CPWo@TNMBt3@%",
+    "administrators": {
+      "administratorType": "ActiveDirectory",
+      "azureADOnlyAuthentication": "true",
+      "login": "ranjeet@spendkey.co.uk",
+      "sid": "6c44c4d9-e290-4a2f-920b-a6d97ed7bec8",
+      "tenantId": "862921fd-f4cb-4a0f-86e9-c450994eb3f9"
+    },
+    "publicNetworkAccess": "Enabled"
+  }
+},
+{
+    "name": "[concat(variables('sql_server_name'),'/',variables('sql_database_name'))]",
+    "type": "Microsoft.Sql/servers/databases",
+    "apiVersion": "2014-04-01",
+    "location": "[parameters('location')]",
+    "tags": {
+        "displayName": "RanjeetDhole"
+    },
+    "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers',variables('sql_server_name'))]"
+    ],
+    "properties": {
+        "collation": "SQL_Latin1_General_CP1_CI_AS",
+        "edition": "Standard",
+        "maxSizeBytes": "21474836480",
+        "requestedServiceObjectiveName": "Standard"
+    }
+}
+    ],
+    "outputs": {}
+}
+
+
+
+
+
+
+
+
+
+
+
+

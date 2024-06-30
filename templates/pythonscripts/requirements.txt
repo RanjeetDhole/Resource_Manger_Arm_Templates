@@ -1,0 +1,11 @@
+pip 
+subprocess.run
+jsons
+os-sys
+azure
+simplejson
+azure-identity
+azure-mgmt-web
+argparse
+
+

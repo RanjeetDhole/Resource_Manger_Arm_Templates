@@ -1,0 +1,35 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "urlName": {
+            "type": "string"
+        },        
+        "location": {
+            "type": "string"
+        }        
+    },
+    "functions": [],
+    "variables": {
+        "app_service_plan_name":"[concat('app-serv-',parameters('urlName'),'-plan')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('app_service_plan_name')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2022-03-01",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "B1",
+                "capacity": 1,
+                "tier": "Basic"
+            },
+            "kind": "linux",
+            "properties": {
+                "reserved": true,
+                "name": "[variables('app_service_plan_name')]"
+            }
+        }
+    ],
+    "outputs": {}
+}

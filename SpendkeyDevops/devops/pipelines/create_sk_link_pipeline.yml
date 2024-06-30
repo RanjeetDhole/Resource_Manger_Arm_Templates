@@ -1,0 +1,54 @@
+
+parameters:
+  - name: urlName
+    displayName: URL Name
+    type: string
+
+trigger: none
+pr: none
+
+resources:
+ repositories:
+ - repository: powerbi
+   type: git
+   name: powerbi
+
+pool:
+  vmImage: "windows-latest"
+
+variables:
+  - name: DECODE_PERCENTS
+    value: true
+
+stages:
+  - stage: ndev
+    displayName: NDev
+    dependsOn: []
+    variables:
+      - group: Common - Prod
+    jobs:
+      - job:
+      # Section Start: Defines new spendkey url need to be configure.
+      #- template: /SpendkeyDevops/devops/jobs/remove_sk_link_jobs.yml@self
+      - template: /SpendkeyDevops/devops/jobs/create_sk_link_jobs.yml@self 
+        parameters:
+          # Mandatory parameters
+          serviceConnection: "DevOps-Production"
+          subscription: "Spendkey Production"
+          subscriptionId: cdef7c62-d8a5-45ce-9c4b-4fe7ef8a9082
+          location: northeurope
+          urlname: ${{ parameters.urlName }}
+          keyvault: kv-ne-prod-spendkey1
+          secrets: "*"
+          dbServerName: sqlsrv-ne-prod-spendkey1
+          resourceGroupName: rg-ne-prod-spendkey
+          godaddy_domain: spendkey.app
+          godaddy_name: ${{ parameters.urlName }}
+          godaddy_destination: fd-ne-prod-spendkey1.azurefd.net.
+          godaddy_key: e4CNfogUXNzM_XKLTmaZ1rZ3VoZCeYVsDZy
+          godaddy_secret: KBpz3tKf4NASXMdHswRA8n
+          ReportName: ${{ parameters.urlName }}
+          
+  # Section End: Defines new spendkey url need to be configure.
+
+   

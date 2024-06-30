@@ -1,0 +1,74 @@
+// {
+//   "type": "Microsoft.DataFactory/factories",
+//   "apiVersion": "2018-06-01",
+//   "name": "adfv2",
+//   "location": "northeurope",
+//   "tags": {
+//     "tagName1": "Ranjeet"
+//   },
+//   "identity": {
+//     "type": "SystemAssigned"
+//   },
+//   "properties": {
+//     "encryption": {
+//       "identity": {
+//         "userAssignedIdentity": "string"
+//       },
+//       "keyName": "string",
+//       "keyVersion": "string",
+//       "vaultBaseUrl": "string"
+//     },
+//     "globalParameters": {
+//       "{customized property}": {
+//         "type": "string",
+//         "value": {}
+//       }
+//     },
+//     "publicNetworkAccess": "string",
+//     "purviewConfiguration": {
+//       "purviewResourceId": "string"
+//     },
+//     "repoConfiguration": {
+//       "accountName": "string",
+//       "collaborationBranch": "string",
+//       "disablePublish": "bool",
+//       "lastCommitId": "string",
+//       "repositoryName": "string",
+//       "rootFolder": "string",
+//       "type": "string"
+
+//     }
+//   }
+// }
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "urlName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        }
+    },
+    "functions" : [],
+    "variables": {
+        "dataFactoryName": "[concat('dbk-sk-',parameters('urlName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.DataFactory/factories",
+            "apiVersion": "2018-06-01",
+            "name": "[variables('dataFactoryName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {}
+        }
+    ],
+    "outputs": {}
+}
+
+

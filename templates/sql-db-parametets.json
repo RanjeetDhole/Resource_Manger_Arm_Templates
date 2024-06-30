@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters":{
+        "sql_server_name": {
+            "value": "sk-sql-server"
+        },
+        "sql_server_loction": {
+            "value": "North Europe"
+        },
+        "SqlSerLogin": {
+            "value": "Spendkey"
+        },
+        "SqlSerPasswd": {
+            "value": "Spend@2022"
+        },
+        "Login" : {
+            "value": "Spendkey"
+        },
+        "SqlDBName" : {
+            "value": "sk-sql-server/db-sk-server"
+        },
+        "SqlDBEdition": {
+            "value": "Standard"
+        }
+        
+
+    }
+  
+}
